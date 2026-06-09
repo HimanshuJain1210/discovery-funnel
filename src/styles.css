@@ -291,3 +291,9 @@ button.ghost { background: transparent; border-color: var(--border); }
   .rice-grid { grid-template-columns: repeat(2, 1fr); }
   .metrics { gap: 24px; }
 }
+
+/* Completion card (#1) */
+.complete-card { margin-top: 28px; padding: 24px; border-radius: var(--radius);
+  background: var(--grad-soft); border: 1px solid var(--border-bright); box-shadow: var(--shadow); }
+.complete-card h3 { font-size: 18px; margin: 6px 0 8px; }
+.complete-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }

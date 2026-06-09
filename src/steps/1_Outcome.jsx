@@ -1,6 +1,6 @@
 import MethodNote from '../components/MethodNote'
 
-export default function Outcome({ state, update, readOnly }) {
+export default function Outcome({ state, update, readOnly, goTo }) {
   return (
     <div className="step">
       <h2>1 · Outcome</h2>
@@ -23,6 +23,12 @@ export default function Outcome({ state, update, readOnly }) {
       <textarea rows={2} disabled={readOnly}
         placeholder="e.g. Increase the share of students who complete a full mock-test review from 20% to 50%"
         value={state.outcome} onChange={(e) => update({ outcome: e.target.value })} />
+
+      {!readOnly && state.idea && state.outcome && goTo && (
+        <button className="primary" style={{ marginTop: 18 }} onClick={() => goTo(1)}>
+          Next: run interviews →
+        </button>
+      )}
     </div>
   )
 }

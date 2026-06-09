@@ -14,7 +14,13 @@ export default function Opportunities({ state, update, readOnly }) {
         outcome: state.outcome,
         painpoints: state.painpoints.map((p) => ({ text: p.text, severity: p.severity })),
       })
-      const withIds = (Array.isArray(opps) ? opps : []).map((o) => ({ id: crypto.randomUUID(), ...o }))
+      // Preserve existing IDs where the title matches, so solutions stay linked
+      // to their opportunity even after a regenerate.
+      const prev = state.opportunities
+      const withIds = (Array.isArray(opps) ? opps : []).map((o) => {
+        const match = prev.find((p) => p.title?.trim().toLowerCase() === o.title?.trim().toLowerCase())
+        return { id: match ? match.id : crypto.randomUUID(), ...o }
+      })
       update({ opportunities: withIds })
     } catch (e) { setErr(e.message) } finally { setLoading(false) }
   }

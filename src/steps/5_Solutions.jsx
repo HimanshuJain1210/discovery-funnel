@@ -8,8 +8,17 @@ function rice(s) {
   if (effort === 0) return 0
   return Math.round((reach * impact * (confidence / 100)) / effort)
 }
+function clampNum(field, raw) {
+  let n = Number(raw)
+  if (Number.isNaN(n)) return ''
+  // Sensible bounds per field so the score can't lie.
+  if (field === 'confidence') n = Math.min(100, Math.max(0, n))
+  else if (field === 'impact') n = Math.min(3, Math.max(0, n))
+  else n = Math.max(0, n) // reach, effort
+  return n
+}
 
-export default function Solutions({ state, update, readOnly }) {
+export default function Solutions({ state, update, readOnly, goTo }) {
   const [loadingId, setLoadingId] = useState(null)
   const [err, setErr] = useState('')
 
@@ -23,6 +32,7 @@ export default function Solutions({ state, update, readOnly }) {
   function edit(id, field, value) {
     update({ solutions: state.solutions.map((s) => (s.id === id ? { ...s, [field]: value } : s)) })
   }
+  function editNum(id, field, value) { edit(id, field, clampNum(field, value)) }
   function remove(id) { update({ solutions: state.solutions.filter((s) => s.id !== id) }) }
 
   async function draftExperiment(s) {
@@ -36,6 +46,8 @@ export default function Solutions({ state, update, readOnly }) {
   }
 
   const sorted = [...state.solutions].sort((a, b) => rice(b) - rice(a))
+  const top = sorted[0]
+  const hasScored = state.solutions.length > 0
 
   return (
     <div className="step">
@@ -48,9 +60,13 @@ export default function Solutions({ state, update, readOnly }) {
       </MethodNote>
 
       {!readOnly && (
-        <button onClick={add} disabled={state.opportunities.length === 0}>+ Add solution</button>
+        <button className="primary" onClick={add} disabled={state.opportunities.length === 0}>+ Add solution</button>
       )}
-      {state.opportunities.length === 0 && <p className="hint">Generate opportunities in step 4 first.</p>}
+      {state.opportunities.length === 0 && (
+        <p className="hint">No opportunities yet. {!readOnly && goTo && (
+          <button className="small" onClick={() => goTo(3)}>← Go to step 4 to generate them</button>
+        )}</p>
+      )}
 
       {sorted.map((s) => (
         <div key={s.id} className="card">
@@ -72,7 +88,7 @@ export default function Solutions({ state, update, readOnly }) {
               <div key={key}>
                 <label>{label}</label>
                 <input type="number" value={s[key]} disabled={readOnly}
-                  onChange={(e) => edit(s.id, key, e.target.value)} />
+                  onChange={(e) => editNum(s.id, key, e.target.value)} />
               </div>
             ))}
           </div>
@@ -102,6 +118,25 @@ export default function Solutions({ state, update, readOnly }) {
         </div>
       ))}
       {err && <p className="err">{err}</p>}
+
+      {/* #1 — completion state: gives the funnel a real ending */}
+      {!readOnly && hasScored && (
+        <div className="complete-card">
+          <span className="eyebrow">Discovery complete</span>
+          <h3>You've run a full discovery cycle.</h3>
+          {top && (
+            <p className="hint">
+              Your highest-priority bet is <strong style={{ color: 'var(--text)' }}>{top.title || 'your top solution'}</strong> (RICE {rice(top)}).
+              {!top.experiment && ' Draft its experiment card above before you build.'}
+            </p>
+          )}
+          <div className="complete-actions">
+            {goTo && <button onClick={() => goTo('tree')}>View the tree</button>}
+            {goTo && <button onClick={() => goTo('insights')}>See insights</button>}
+            <button className="primary" onClick={() => goTo && goTo('export')}>Export / share</button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

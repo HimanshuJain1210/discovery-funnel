@@ -68,6 +68,17 @@ export default function Funnel({ session }) {
   const props = { state, update, readOnly: false }
   const progress = stageProgress(state)
 
+  // Unified navigation: step indices OR view names ('tree','insights','export').
+  function goTo(target) {
+    if (typeof target === 'number') { setView('steps'); setStep(target); return }
+    if (target === 'export') { setView('steps'); window.scrollTo({ top: 0, behavior: 'smooth' }); return }
+    setView(target) // 'tree' | 'insights'
+  }
+  const stepProps = { ...props, goTo }
+
+  const hasOpps = state.opportunities.length > 0
+  const hasAnyData = state.painpoints.length > 0 || state.solutions.length > 0 || hasOpps
+
   return (
     <div className="funnel">
       <div className="row-between funnel-top">
@@ -90,8 +101,14 @@ export default function Funnel({ session }) {
       </div>
       {shareMsg && <p className="hint share-msg">{shareMsg}</p>}
 
-      {view === 'tree' && <OSTree state={state} />}
-      {view === 'insights' && <Insights state={state} update={update} />}
+      {view === 'tree' && (hasOpps
+        ? <OSTree state={state} />
+        : <div className="empty"><p>Your tree builds itself as you work.</p>
+            <button className="primary" onClick={() => goTo(3)}>Generate opportunities first</button></div>)}
+      {view === 'insights' && (hasAnyData
+        ? <Insights state={state} update={update} />
+        : <div className="empty"><p>Insights appear once you have interviews or pain points.</p>
+            <button className="primary" onClick={() => goTo(1)}>Start with interviews</button></div>)}
       {view === 'steps' && (
         <>
           <nav className="stepnav">
@@ -104,16 +121,18 @@ export default function Funnel({ session }) {
           </nav>
 
           <main>
-            {step === 0 && <Outcome {...props} />}
-            {step === 1 && <Interviews {...props} />}
-            {step === 2 && <PainPoints {...props} />}
-            {step === 3 && <Opportunities {...props} />}
-            {step === 4 && <Solutions {...props} />}
+            {step === 0 && <Outcome {...stepProps} />}
+            {step === 1 && <Interviews {...stepProps} />}
+            {step === 2 && <PainPoints {...stepProps} />}
+            {step === 3 && <Opportunities {...stepProps} />}
+            {step === 4 && <Solutions {...stepProps} />}
           </main>
 
           <footer className="navfoot">
-            <button disabled={step === 0} onClick={() => setStep(step - 1)}>← Back</button>
-            <button className="primary" disabled={step === STEPS.length - 1} onClick={() => setStep(step + 1)}>Next →</button>
+            <button className="ghost" disabled={step === 0} onClick={() => setStep(step - 1)}>← Back</button>
+            {step < STEPS.length - 1
+              ? <button className="primary" onClick={() => setStep(step + 1)}>Next: {STEPS[step + 1]} →</button>
+              : <button className="primary" onClick={() => goTo('tree')}>View the tree →</button>}
           </footer>
         </>
       )}

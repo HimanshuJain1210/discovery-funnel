@@ -10,6 +10,11 @@ export default function OSTree({ state }) {
   if (!outcome && opportunities.length === 0) {
     return <p className="hint">Define an outcome and generate opportunities to see your tree.</p>
   }
+  // Self-heal: a solution whose opportunityId no longer exists (e.g. opportunities
+  // were regenerated) is shown under the first opportunity instead of vanishing.
+  const oppIds = new Set(opportunities.map((o) => o.id))
+  const solOf = (oId, isFirst) =>
+    solutions.filter((s) => s.opportunityId === oId || (isFirst && !oppIds.has(s.opportunityId)))
   return (
     <div className="ost">
       <div className="ost-outcome">
@@ -19,8 +24,8 @@ export default function OSTree({ state }) {
       <div className="ost-trunk" />
       <div className="ost-opps">
         {opportunities.length === 0 && <p className="hint">No opportunities yet.</p>}
-        {opportunities.map((o) => {
-          const sols = solutions.filter((s) => s.opportunityId === o.id)
+        {opportunities.map((o, idx) => {
+          const sols = solOf(o.id, idx === 0)
           return (
             <div key={o.id} className="ost-branch">
               <div className="ost-opp">
