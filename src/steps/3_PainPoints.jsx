@@ -34,7 +34,8 @@ export default function PainPoints({ state, update, readOnly }) {
           <textarea rows={2} value={p.text} disabled={readOnly}
             onChange={(e) => editText(p.id, e.target.value)} />
           <div className="tag-row">
-            {p.evidence_type && <span className="tag">{EV_LABEL[p.evidence_type] || p.evidence_type}</span>}
+            {p.evidence_type && <span className="tag ev">{EV_LABEL[p.evidence_type] || p.evidence_type}</span>}
+            {p.source && <span className="tag">from: {p.source}</span>}
           </div>
           {p.evidence && <p className="evidence">Evidence: {p.evidence}</p>}
           {!readOnly && (

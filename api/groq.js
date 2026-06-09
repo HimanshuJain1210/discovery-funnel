@@ -41,6 +41,7 @@ For each genuine pain point return an object with:
 - "severity": "high" | "medium" | "low" — high = recurring + costly + emotionally charged; low = mentioned once, mild
 - "evidence_type": "past_behaviour" | "money_spent" | "time_spent" | "workaround" | "abandoned_attempt" | "emotional" — the strongest evidence class supporting it
 - "evidence": a short PARAPHRASE of the supporting behaviour or quote (never copy text verbatim; reword it)
+- "source": the name/label of the interview this came from, copied exactly from the input. If it spans several, name the clearest one.
 
 If the notes contain only noise, return an empty array. Do not invent pains to be helpful.
 
@@ -95,6 +96,22 @@ Return ONLY a JSON object (no markdown, no backticks) with:
 - "metric": the one number that decides pass/fail
 - "threshold": the specific value that counts as success
 - "duration": a realistic time-box (e.g. "1 week", "20 user tests")`,
+  },
+
+  synthesis: {
+    temperature: 0.4,
+    system: `You are a senior product researcher synthesising a round of user interviews.
+
+Given the product idea, target outcome, and an array of interviews (each with a name and notes), produce a cross-interview synthesis that a PM could present to stakeholders.
+
+Be rigorous and honest: surface patterns that actually recur across MULTIPLE interviews, note where evidence is thin, and never inflate weak signals. Ground every theme in what people DID, not what they said they'd do.
+
+Return ONLY a JSON object (no markdown, no backticks) with:
+- "summary": 2-3 sentences capturing the headline insight from this round
+- "themes": array of 3-5 objects, each { "title": short theme name, "description": one sentence, "frequency": integer count of how many interviews show it }
+- "surprises": array of 0-3 strings — findings that contradict the product idea or were unexpected
+- "confidence": "high" | "medium" | "low" — your confidence in these findings given the sample size and evidence quality
+- "next": one sentence on what to investigate next`,
   },
 }
 

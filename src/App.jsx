@@ -19,7 +19,7 @@ function TopBar({ session }) {
   async function signOut() { await supabase.auth.signOut(); nav('/') }
   return (
     <header className="topbar">
-      <Link to="/" className="brand">Discovery Funnel</Link>
+      <Link to="/" className="brand"><span className="brand-dot" />Discovery Funnel</Link>
       <div className="header-right">
         <ThemeButton />
         {session && <button className="small" onClick={signOut}>Sign out</button>}

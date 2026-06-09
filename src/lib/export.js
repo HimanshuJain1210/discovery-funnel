@@ -24,10 +24,19 @@ export function toMarkdown(name, s) {
     : L.push('_None yet._')
   L.push('')
 
+  if (s.synthesis) {
+    const sy = s.synthesis
+    L.push(`### Synthesis`, '')
+    if (sy.summary) L.push(sy.summary, '')
+    if (Array.isArray(sy.themes)) sy.themes.forEach((t) => L.push(`- **${t.title}** (${t.frequency ?? '?'}) — ${t.description || ''}`))
+    if (sy.confidence) L.push('', `Confidence: ${sy.confidence}`)
+    L.push('')
+  }
+
   L.push(`## 3. Pain points`, '')
   s.painpoints.length
     ? s.painpoints.forEach((p) =>
-        L.push(`- [${p.severity?.toUpperCase()}] ${p.text}${p.evidence ? ` _(evidence: ${p.evidence})_` : ''}`))
+        L.push(`- [${p.severity?.toUpperCase()}] ${p.text}${p.source ? ` — from ${p.source}` : ''}${p.evidence ? ` _(evidence: ${p.evidence})_` : ''}`))
     : L.push('_None yet._')
   L.push('')
 

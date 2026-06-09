@@ -9,6 +9,7 @@ export function emptyState() {
     painpoints: [],
     opportunities: [],
     solutions: [],
+    synthesis: null,
   }
 }
 
@@ -24,6 +25,7 @@ export function normaliseState(s) {
     painpoints: Array.isArray(s.painpoints) ? s.painpoints : [],
     opportunities: Array.isArray(s.opportunities) ? s.opportunities : [],
     solutions: Array.isArray(s.solutions) ? s.solutions : [],
+    synthesis: s.synthesis || null,
   }
 }
 
