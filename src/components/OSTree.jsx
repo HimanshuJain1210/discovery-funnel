@@ -35,8 +35,8 @@ export default function OSTree({ state }) {
               <div className="ost-sols">
                 {sols.length === 0 && <span className="ost-empty">no solutions yet</span>}
                 {sols.map((s) => (
-                  <div key={s.id} className="ost-sol">
-                    <p>{s.title || 'Untitled'}</p>
+                  <div key={s.id} className={`ost-sol ${s.status ? 'st-' + s.status : ''}`}>
+                    <p>{s.status && s.status !== 'not_started' && <span className={`ost-dot st-${s.status}`} />}{s.title || 'Untitled'}</p>
                     <span className="ost-rice">RICE {riceScore(s)}</span>
                   </div>
                 ))}

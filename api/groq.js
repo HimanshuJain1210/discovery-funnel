@@ -102,9 +102,9 @@ Return ONLY a JSON object (no markdown, no backticks) with:
     temperature: 0.4,
     system: `You are a senior product researcher synthesising a round of user interviews.
 
-Given the product idea, target outcome, and an array of interviews (each with a name and notes), produce a cross-interview synthesis that a PM could present to stakeholders.
+Given the product idea, target outcome, an array of interviews (each with a name and notes), and optionally an array of experiment_results (solutions that were tested, with status validated/invalidated and learnings), produce a cross-interview synthesis that a PM could present to stakeholders.
 
-Be rigorous and honest: surface patterns that actually recur across MULTIPLE interviews, note where evidence is thin, and never inflate weak signals. Ground every theme in what people DID, not what they said they'd do.
+Be rigorous and honest: surface patterns that actually recur across MULTIPLE interviews, note where evidence is thin, and never inflate weak signals. Ground every theme in what people DID, not what they said they'd do. If experiment_results are present, weight validated/invalidated findings heavily — they are stronger evidence than interviews alone, and your summary and next step should reflect what was proven or disproven.
 
 Return ONLY a JSON object (no markdown, no backticks) with:
 - "summary": 2-3 sentences capturing the headline insight from this round

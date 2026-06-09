@@ -297,3 +297,21 @@ button.ghost { background: transparent; border-color: var(--border); }
   background: var(--grad-soft); border: 1px solid var(--border-bright); box-shadow: var(--shadow); }
 .complete-card h3 { font-size: 18px; margin: 6px 0 8px; }
 .complete-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+
+/* Experiment tracker — closes the loop */
+.tracker { margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--border-bright); }
+.status-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.status-btn.active.st-validated { background: rgba(87,217,154,.18); border-color: var(--low); color: var(--low); }
+.status-btn.active.st-invalidated { background: rgba(244,112,138,.16); border-color: var(--danger); color: var(--danger); }
+.status-btn.active.st-building { background: rgba(245,183,78,.16); border-color: var(--medium); color: var(--medium); }
+.status-btn.active.st-not_started { background: var(--surface-3); }
+.status-pill { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; }
+.status-pill.st-validated { background: rgba(87,217,154,.18); color: var(--low); }
+.status-pill.st-invalidated { background: rgba(244,112,138,.16); color: var(--danger); }
+.status-pill.st-building { background: rgba(245,183,78,.16); color: var(--medium); }
+.ost-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+.ost-dot.st-validated { background: var(--low); }
+.ost-dot.st-invalidated { background: var(--danger); }
+.ost-dot.st-building { background: var(--medium); }
+.ost-sol.st-validated { border-color: var(--low); }
+.ost-sol.st-invalidated { border-color: var(--danger); }

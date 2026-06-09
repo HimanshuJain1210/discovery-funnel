@@ -18,6 +18,14 @@ function clampNum(field, raw) {
   return n
 }
 
+export const STATUSES = [
+  { key: 'not_started', label: 'Not started' },
+  { key: 'building', label: 'Building' },
+  { key: 'validated', label: 'Validated' },
+  { key: 'invalidated', label: 'Invalidated' },
+]
+const STATUS_LABEL = Object.fromEntries(STATUSES.map((s) => [s.key, s.label]))
+
 export default function Solutions({ state, update, readOnly, goTo }) {
   const [loadingId, setLoadingId] = useState(null)
   const [err, setErr] = useState('')
@@ -48,6 +56,8 @@ export default function Solutions({ state, update, readOnly, goTo }) {
   const sorted = [...state.solutions].sort((a, b) => rice(b) - rice(a))
   const top = sorted[0]
   const hasScored = state.solutions.length > 0
+  const validatedCount = state.solutions.filter((s) => s.status === 'validated').length
+  const invalidatedCount = state.solutions.filter((s) => s.status === 'invalidated').length
 
   return (
     <div className="step">
@@ -73,7 +83,12 @@ export default function Solutions({ state, update, readOnly, goTo }) {
           <div className="row-between">
             <input placeholder="Solution title" disabled={readOnly}
               value={s.title} onChange={(e) => edit(s.id, 'title', e.target.value)} />
-            <span className="rice-badge">RICE {rice(s)}</span>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+              {s.status && s.status !== 'not_started' && (
+                <span className={`status-pill st-${s.status}`}>{STATUS_LABEL[s.status]}</span>
+              )}
+              <span className="rice-badge">RICE {rice(s)}</span>
+            </div>
           </div>
 
           <label>Addresses opportunity</label>
@@ -107,6 +122,34 @@ export default function Solutions({ state, update, readOnly, goTo }) {
               <p><strong>Method:</strong> {s.experiment.method}</p>
               <p><strong>Metric:</strong> {s.experiment.metric} — success at {s.experiment.threshold}</p>
               {s.experiment.duration && <p><strong>Duration:</strong> {s.experiment.duration}</p>}
+
+              {/* Experiment result tracker — closes the discovery loop */}
+              <div className="tracker">
+                <label>Experiment status</label>
+                <div className="status-row">
+                  {STATUSES.map((st) => (
+                    <button key={st.key} disabled={readOnly}
+                      className={`small status-btn ${s.status === st.key ? 'active' : ''} st-${st.key}`}
+                      onClick={() => edit(s.id, 'status', st.key)}>{st.label}</button>
+                  ))}
+                </div>
+                {(s.status === 'validated' || s.status === 'invalidated') && (
+                  <>
+                    <label>Result — what did the metric actually do?</label>
+                    <input placeholder={`e.g. hit ${s.experiment.metric || 'the metric'}: 32% vs ${s.experiment.threshold || 'target'}`}
+                      disabled={readOnly} value={s.result || ''}
+                      onChange={(e) => edit(s.id, 'result', e.target.value)} />
+                  </>
+                )}
+                {s.status && s.status !== 'not_started' && (
+                  <>
+                    <label>What you learned</label>
+                    <textarea rows={2} disabled={readOnly}
+                      placeholder="The takeaway — what this changes about your next move."
+                      value={s.learnings || ''} onChange={(e) => edit(s.id, 'learnings', e.target.value)} />
+                  </>
+                )}
+              </div>
             </div>
           )}
 
@@ -122,13 +165,19 @@ export default function Solutions({ state, update, readOnly, goTo }) {
       {/* #1 — completion state: gives the funnel a real ending */}
       {!readOnly && hasScored && (
         <div className="complete-card">
-          <span className="eyebrow">Discovery complete</span>
-          <h3>You've run a full discovery cycle.</h3>
+          <span className="eyebrow">Discovery loop</span>
+          <h3>{validatedCount > 0 ? "You've closed the loop." : "You've run a full discovery cycle."}</h3>
           {top && (
             <p className="hint">
               Your highest-priority bet is <strong style={{ color: 'var(--text)' }}>{top.title || 'your top solution'}</strong> (RICE {rice(top)}).
               {!top.experiment && ' Draft its experiment card above before you build.'}
+              {top.experiment && !top.status && ' Run it, then log the result above to close the loop.'}
+              {top.status === 'validated' && ' Validated — strong evidence to build.'}
+              {top.status === 'invalidated' && ' Invalidated — better to learn this now than after building.'}
             </p>
+          )}
+          {(validatedCount > 0 || invalidatedCount > 0) && (
+            <p className="hint">{validatedCount} validated · {invalidatedCount} invalidated · {state.solutions.length} total</p>
           )}
           <div className="complete-actions">
             {goTo && <button onClick={() => goTo('tree')}>View the tree</button>}

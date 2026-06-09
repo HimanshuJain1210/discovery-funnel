@@ -31,6 +31,9 @@ export default function Insights({ state, update }) {
       const result = await callGroq('synthesis', {
         idea: state.idea, outcome: state.outcome,
         interviews: interviews.map((i) => ({ name: i.name || 'Unnamed', notes: i.notes })),
+        experiment_results: state.solutions
+          .filter((s) => s.status === 'validated' || s.status === 'invalidated')
+          .map((s) => ({ solution: s.title, status: s.status, result: s.result || '', learnings: s.learnings || '' })),
       })
       update({ synthesis: result })
     } catch (e) { setErr(e.message) } finally { setLoading(false) }

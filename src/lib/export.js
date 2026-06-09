@@ -51,7 +51,7 @@ export function toMarkdown(name, s) {
     const sorted = [...s.solutions].sort((a, b) => riceScore(b) - riceScore(a))
     sorted.forEach((sol) => {
       const opp = s.opportunities.find((o) => o.id === sol.opportunityId)
-      L.push(`### ${sol.title || 'Untitled'} — RICE ${riceScore(sol)}`)
+      L.push(`### ${sol.title || 'Untitled'} — RICE ${riceScore(sol)}${sol.status && sol.status !== 'not_started' ? ` [${sol.status.toUpperCase()}]` : ''}`)
       if (opp) L.push(`Addresses: ${opp.title}`)
       L.push(`Reach ${sol.reach} · Impact ${sol.impact} · Confidence ${sol.confidence}% · Effort ${sol.effort}`)
       if (sol.experiment) {
@@ -63,6 +63,8 @@ export function toMarkdown(name, s) {
         L.push(`- Metric: ${e.metric} — success at ${e.threshold}`)
         if (e.duration) L.push(`- Duration: ${e.duration}`)
       }
+      if (sol.result) L.push(`- Result: ${sol.result}`)
+      if (sol.learnings) L.push(`- Learned: ${sol.learnings}`)
       L.push('')
     })
   } else {
